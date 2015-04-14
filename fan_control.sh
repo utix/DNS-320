@@ -11,36 +11,36 @@ HddHalt=39
 FAN="init"
 
 if [ -n  "`pidof syslogd`" ] ; then
-   logcommand()
-   {
-   logger $1
-   }
+    logcommand()
+    {
+        logger "FanControl: $1"
+    }
 else
-   logcommand()
-   {
-   echo "`/bin/date '+%b %e %H:%M:%S'`:" $1 >> $LOGFILE
-   }
+    logcommand()
+    {
+        echo "`/bin/date '+%b %e %H:%M:%S'`: FanControl: " $1 >> $LOGFILE
+    }
 fi
 
 disk_temp() {
-        if [ -s /tmp/hdd ]; then
-                T=-1
-        else
-                Ta=`smartctl -d marvell --all /dev/sda |grep -e ^194 | head -c 40 | tail -c 2`
-                Tb=`smartctl -d marvell --all /dev/sdb |grep -e ^194 | head -c 40 | tail -c 2`
-                if [ -z "$Ta" ]; then
-                Ta=0
-                fi
-                if [ -z "$Tb" ]; then
-                Tb=0
-                fi
-                if [ $Ta -gt $Tb ]; then
-                # Assign the higher temperature
-                        T=$Ta
-                else
-                        T=$Tb
-                fi
+    if [ -s /tmp/hdd ]; then
+        T=-1
+    else
+        Ta=`smartctl -d marvell --all /dev/sda |grep -e ^194 | head -c 40 | tail -c 2`
+        Tb=`smartctl -d marvell --all /dev/sdb |grep -e ^194 | head -c 40 | tail -c 2`
+        if [ -z "$Ta" ]; then
+            Ta=0
         fi
+        if [ -z "$Tb" ]; then
+            Tb=0
+        fi
+        if [ $Ta -gt $Tb ]; then
+            # Assign the higher temperature
+            T=$Ta
+        else
+            T=$Tb
+        fi
+    fi
 }
 
 system_temp() {
@@ -50,13 +50,12 @@ system_temp() {
     fi
 }
 
-logcommand "  Starting DNS-320 Fancontrol script"
+logcommand "Starting DNS-320 Fancontrol script"
 disk_temp
 system_temp
-logcommand "  Current temperatures: Sys: "$ST"C, HDD: "$T"C "
+logcommand "Current temperatures: Sys: "$ST"C, HDD: "$T"C "
 
 while /ffp/bin/true; do
-    #killall fan_control >/dev/null 2>/dev/null &
     echo $FAN > /var/tmp/fan
     case $FAN in
         low)
