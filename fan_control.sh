@@ -65,6 +65,11 @@ while /ffp/bin/true; do
         stop)
         fanspeed s >/dev/null 2>/dev/null &
         ;;
+        init)
+        fanspeed h >/dev/null 2>/dev/null &
+        logcommand "Initialize, run fan full speed and stop if it's possible"
+        FAN=stop # start full speed then stop if temp is between low and stop */
+        ;;
         *)
         fanspeed h >/dev/null 2>/dev/null &
         ;;
