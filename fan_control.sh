@@ -2,12 +2,12 @@
 
 PERIOD=30
 LOGFILE=/var/log/fan.log
-SysHigh=55
-SysLow=52
-SysHalt=45
-HddHigh=48
-HddLow=45
-HddHalt=40
+SysHigh=48
+SysLow=47
+SysHalt=43
+HddHigh=43
+HddLow=41
+HddHalt=39
 FAN="init"
 
 if [ -n  "`pidof syslogd`" ] ; then
