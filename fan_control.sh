@@ -44,7 +44,10 @@ disk_temp() {
 }
 
 system_temp() {
-        ST=`FT_testing -T | tail -c 3 | head -c 2`
+    ST=`FT_testing -T | tail -c 3 | head -c 2`
+    if [ -z $ST ]; then
+        system_temp
+    fi
 }
 
 logcommand "  Starting DNS-320 Fancontrol script"
