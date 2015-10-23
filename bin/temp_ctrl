@@ -2,12 +2,12 @@
 
 PERIOD=30
 LOGFILE=/var/log/fan.log
-SysHigh=48
-SysLow=47
-SysHalt=43
-HddHigh=43
-HddLow=41
-HddHalt=39
+SysHigh=45
+SysLow=41
+SysHalt=37
+HddHigh=37
+HddLow=34
+HddHalt=30
 FAN="init"
 
 if [ -n  "`pidof syslogd`" ] ; then
@@ -45,7 +45,10 @@ disk_temp() {
 
 system_temp() {
     ST=`FT_testing -T | tail -c 3 | head -c 2`
-    if [ -z $ST ]; then
+    if [ -z "$ST" ]; then
+        system_temp
+    fi
+    if [ "$ST" -le 10 ]; then
         system_temp
     fi
 }
@@ -77,7 +80,7 @@ while /ffp/bin/true; do
     disk_temp
     system_temp
     if [ $ST -ge $SysHigh -o $T -ge $HddHigh ]; then
-        if [ $FAN != high ]; then
+        if [ $FAN != 'high' ]; then
             logcommand "Running fan on high, temperature too high: Sys: "$ST"C, HDD: "$T"C "
         fi
         FAN=high
@@ -90,9 +93,18 @@ while /ffp/bin/true; do
         FAN=stop
         continue
     fi
+    if [ $FAN = 'high' ]; then
+        if [ $ST -le $SysLow -a $T -le $HddLow ]; then
+            if [ $FAN != 'low' ]; then
+                logcommand "Running fan on low, temperature: Sys: "$ST"C, HDD: "$T"C "
+            fi
+            FAN=low
+        fi
+        continue
+    fi
     if [ $ST -ge $SysLow -o $T -ge $HddLow ]; then
         if [ $FAN != 'low' ]; then
-            logcommand "Running fan on low, temperature going down: Sys: "$ST"C, HDD: "$T"C "
+            logcommand "Running fan on low, temperature: Sys: "$ST"C, HDD: "$T"C "
         fi
         FAN=low
         continue
